@@ -1,0 +1,21 @@
+{
+  "name": "ReactD3Learning",
+  "version": "0.0.0",
+  "authors": [
+    "JC Nesci <jc.nesci@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.6",
+    "react": "~0.13.3",
+    "bootstrap": "~3.3.5",
+    "lodash": "~3.10.0"
+  }
+}
