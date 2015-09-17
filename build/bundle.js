@@ -41471,7 +41471,44 @@ var	React = require("./../bower_components/react/react.js"),
 		d3 = require("./../bower_components/d3/d3.js");
 
 var H1BGraph = React.createClass({displayName: "H1BGraph",
+	componentWillMount: function () {
+    this.loadRawData();
+	},
+	getInitialState: function () {
+    return {rawData: []};
+	},
+	loadRawData: function () {
+		var dateFormat = d3.time.format('%m%d%Y');
+		d3.csv(this.props.url)
+			.row(function (d) {
+				if (!d['base salary']) {
+					return null;
+				}
+				return {
+					employer: d.employer,
+					submit_date: dateFormat.parse(d['submit date']),
+					start_date: dateFormat.parse(d['start date']),
+					case_status: d['case status'],
+					job_title: d['job title'],
+					base_salary: Number(d['base salary']),
+					salary_to: d['salary to'] ? Number(d['salary to']) : null,
+					city: d.city,
+					state: d.state
+				};
+			}.bind(this))
+			.get(function (error, rows){
+				if (error) {
+					console.error(error);
+					console.error(error.stack);
+				} else {
+					this.setState({rawData: rows});
+				}
+			}.bind(this));
+	},
 	render: function () {
+		if (!this.state.rawData.length) {
+			return (React.createElement("h2", null, "Loading data about 81,000 H1B visas in the software industry."));
+		}
 		return (
 			React.createElement("div", {className: "row"}, 
 				React.createElement("div", {className: "col-md-12"}, 
