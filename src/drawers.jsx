@@ -40,6 +40,7 @@ var Histogram = React.createClass({
 			key: 'histogram-bar-'+ bar.x +'-'+ bar.y
 		};
 		return (
+			// ES6 trick to pass around complex attributes. Translates '...props' into 'percent={percent} x=...' etc.
 			<HistogramBar {...props} />
 		);
 	},
@@ -48,8 +49,27 @@ var Histogram = React.createClass({
 		return (
 			<g className='histogram' transform={translate}>
 				<g className='bars'>
+					// Make each bar individually, returning a bar as a subcomponent
+					// instead of a lump of all bars together, cuz it aligns better with React principles.
 					{this.state.bars.map(this.makeBar)}
 				</g>
+			</g>
+		);
+	}
+});
+
+var HistogramBar = React.createClass({
+	render: function () {
+		var translate = 'translate(' + this.props.x + ',' + this.props.y + ')',
+			label = this.props.percent.toFixed(0) + '%';
+
+		return (
+			<g transform={translate} className='bar'>
+				<rect width={this.props.width}
+							height={this.props.height - 2}
+							transform='translate(0, 1)'>
+				</rect>
+				// p.29
 			</g>
 		);
 	}
