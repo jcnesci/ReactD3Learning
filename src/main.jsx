@@ -1,6 +1,7 @@
 var	React = require('react'),
 		_ = require('lodash'),
-		d3 = require('d3');
+		d3 = require('d3'),
+		drawers = require('./drawers.jsx');
 
 var H1BGraph = React.createClass({
 	componentWillMount: function () {
@@ -41,10 +42,23 @@ var H1BGraph = React.createClass({
 		if (!this.state.rawData.length) {
 			return (<h2>Loading data about 81,000 H1B visas in the software industry.</h2>);
 		}
+
+		var params = {
+			bins: 20,
+			width: 500,
+			height: 500,
+			axisMargin: 83,
+			topMargin: 10,
+			bottomMargin: 5,
+			value: function (d) { return d.base_salary; }
+		},
+			fullWidth = 700;
+
 		return (
-			<div className='row'>
-				<div className='col-md-12'>
-					<svg width='700' height='500'>
+			<div className = 'row'>
+				<div className = 'col-md-12'>
+					<svg width = {fullWidth} height = {params.height}>
+						<drawers.Histogram {...params} data = {this.state.rawData} />
 					</svg>
 				</div>
 			</div>

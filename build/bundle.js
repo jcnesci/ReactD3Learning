@@ -41466,9 +41466,108 @@ module.exports = warning;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],4:[function(require,module,exports){
+var React = require("./../bower_components/react/react.js"),
+		d3 = require("./../bower_components/d3/d3.js");
+
+var Histogram = React.createClass({displayName: "Histogram",
+	componentWillMount: function () {
+	  this.histogram = d3.layout.histogram();
+	  this.widthScale = d3.scale.linear();
+	  this.yScale = d3.scale.linear();
+	  this.update_d3(this.props);
+	},
+	componentWillReceiveProps: function (nextProps) {
+	  this.update_d3(nextProps);
+	},
+	update_d3: function (props) {
+		this.histogram
+			.bins(props.bins)
+			.value(this.props.value);
+
+		var bars = this.histogram(props.data),
+			counts = bars.map(function (d) { return d.y; });
+
+		this.setState({bars: bars});
+
+		this.widthScale
+			.domain([d3.min(counts), d3.max(counts)])
+			.range([9, props.width-props.axisMargin]);
+
+		this.yScale
+			.domain([0, d3.max( bars.map(function (d) { return d.x+d.dx; }) )])
+			.range([0, props.height-props.topMargin-props.bottomMargin]);
+	},
+	makeBar: function (bar) {
+		var percent = bar.y/this.props.data.length*100;
+		var props = {
+			percent: percent,
+			x: this.props.axisMargin,
+			y: this.yScale(bar.x),
+			width: this.widthScale(bar.y),
+			height: this.yScale(bar.dx),
+			key: 'histogram-bar-'+ bar.x +'-'+ bar.y
+		};
+
+		// ES6 trick to pass around complex attributes. Translates '...props' into 'percent={percent} x=...' etc.
+		return (
+			React.createElement(HistogramBar, React.__spread({},  props))
+		);
+	},
+	render: function () {
+		var translate = 'translate(0, '+ this.props.topMargin +')';
+
+		// Make each bar individually, returning a bar as a subcomponent
+		// instead of a lump of all bars together, cuz it aligns better with React principles.
+		return (
+			React.createElement("g", {className: "histogram", transform: translate}, 
+				React.createElement("g", {className: "bars"}, 
+					this.state.bars.map(this.makeBar)
+				)
+			)
+		);
+	}
+});
+
+var HistogramBar = React.createClass({displayName: "HistogramBar",
+	render: function () {
+		var translate = 'translate(' + this.props.x + ',' + this.props.y + ')',
+			label = this.props.percent.toFixed(0) + '%';
+
+		if (this.props.percent < 1) {
+			label = this.props.percent.toFixed(2) + '%';
+		}
+		if (this.props.width < 20) {
+			label = label.replace('%', '');
+		}
+		if (this.props.width < 10) {
+			label = '';
+		}
+
+		return (
+			React.createElement("g", {transform: translate, className: "bar"}, 
+				React.createElement("rect", {width: this.props.width, 
+							height: this.props.height - 2, 
+							transform: "translate(0, 1)"}
+				), 
+				React.createElement("text", {textAnchor: "end", 
+							x: this.props.width - 5, 
+							y: this.props.height / 2 + 3}, 
+					label
+				)
+			)
+		);
+	}
+});
+
+module.exports = {
+	Histogram: Histogram
+};
+
+},{"./../bower_components/d3/d3.js":1,"./../bower_components/react/react.js":3}],5:[function(require,module,exports){
 var	React = require("./../bower_components/react/react.js"),
 		_ = require("./../bower_components/lodash/lodash.js"),
-		d3 = require("./../bower_components/d3/d3.js");
+		d3 = require("./../bower_components/d3/d3.js"),
+		drawers = require('./drawers.jsx');
 
 var H1BGraph = React.createClass({displayName: "H1BGraph",
 	componentWillMount: function () {
@@ -41509,10 +41608,23 @@ var H1BGraph = React.createClass({displayName: "H1BGraph",
 		if (!this.state.rawData.length) {
 			return (React.createElement("h2", null, "Loading data about 81,000 H1B visas in the software industry."));
 		}
+
+		var params = {
+			bins: 20,
+			width: 500,
+			height: 500,
+			axisMargin: 83,
+			topMargin: 10,
+			bottomMargin: 5,
+			value: function (d) { return d.base_salary; }
+		},
+			fullWidth = 700;
+
 		return (
 			React.createElement("div", {className: "row"}, 
 				React.createElement("div", {className: "col-md-12"}, 
-					React.createElement("svg", {width: "700", height: "500"}
+					React.createElement("svg", {width: fullWidth, height: params.height}, 
+						React.createElement(drawers.Histogram, React.__spread({},  params, {data: this.state.rawData}))
 					)
 				)
 			)
@@ -41525,4 +41637,4 @@ React.render(
 	document.querySelectorAll('.h1bgraph')[0]
 );
 
-},{"./../bower_components/d3/d3.js":1,"./../bower_components/lodash/lodash.js":2,"./../bower_components/react/react.js":3}]},{},[4]);
+},{"./../bower_components/d3/d3.js":1,"./../bower_components/lodash/lodash.js":2,"./../bower_components/react/react.js":3,"./drawers.jsx":4}]},{},[5]);

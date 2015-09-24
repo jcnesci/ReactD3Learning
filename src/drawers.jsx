@@ -39,18 +39,20 @@ var Histogram = React.createClass({
 			height: this.yScale(bar.dx),
 			key: 'histogram-bar-'+ bar.x +'-'+ bar.y
 		};
+
+		// ES6 trick to pass around complex attributes. Translates '...props' into 'percent={percent} x=...' etc.
 		return (
-			// ES6 trick to pass around complex attributes. Translates '...props' into 'percent={percent} x=...' etc.
 			<HistogramBar {...props} />
 		);
 	},
 	render: function () {
 		var translate = 'translate(0, '+ this.props.topMargin +')';
+
+		// Make each bar individually, returning a bar as a subcomponent
+		// instead of a lump of all bars together, cuz it aligns better with React principles.
 		return (
 			<g className='histogram' transform={translate}>
 				<g className='bars'>
-					// Make each bar individually, returning a bar as a subcomponent
-					// instead of a lump of all bars together, cuz it aligns better with React principles.
 					{this.state.bars.map(this.makeBar)}
 				</g>
 			</g>
@@ -63,13 +65,27 @@ var HistogramBar = React.createClass({
 		var translate = 'translate(' + this.props.x + ',' + this.props.y + ')',
 			label = this.props.percent.toFixed(0) + '%';
 
+		if (this.props.percent < 1) {
+			label = this.props.percent.toFixed(2) + '%';
+		}
+		if (this.props.width < 20) {
+			label = label.replace('%', '');
+		}
+		if (this.props.width < 10) {
+			label = '';
+		}
+
 		return (
-			<g transform={translate} className='bar'>
-				<rect width={this.props.width}
-							height={this.props.height - 2}
-							transform='translate(0, 1)'>
+			<g transform = {translate} className = 'bar'>
+				<rect width = {this.props.width}
+							height = {this.props.height - 2}
+							transform = 'translate(0, 1)'>
 				</rect>
-				// p.29
+				<text textAnchor = 'end'
+							x = {this.props.width - 5}
+							y = {this.props.height / 2 + 3}>
+					{label}
+				</text>
 			</g>
 		);
 	}
