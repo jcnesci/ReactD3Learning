@@ -41559,6 +41559,33 @@ var HistogramBar = React.createClass({displayName: "HistogramBar",
 	}
 });
 
+var Axis = React.createClass({displayName: "Axis",
+	componentWillMount: function () {
+		this.yScale = d3.scale.linear();
+		this.axis = d3.svg.axis()
+									.scale(this.yScale)
+									.orient('left')
+									.tickFormat(function (d) {
+										// Why tickFormat()(d) ?
+										return ('$' + this.yScale.tickFormat()(d));
+									}.bind(this));
+	  this.update_d3(this.props);
+	},
+	componentWillReceiveProps: function (nextProps) {
+	  this.update_d3(nextProps);
+	},
+	udpate_d3: function (props) {
+
+	},
+	render: function () {
+		var translate = 'translate(' + (this.props.axisMargin - 3) + ', 0)';
+		return (
+			React.createElement("g", {className: "axis", transform: translate}
+			)
+		);
+	}
+});
+
 module.exports = {
 	Histogram: Histogram
 };
