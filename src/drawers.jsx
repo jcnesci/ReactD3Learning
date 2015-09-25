@@ -55,6 +55,7 @@ var Histogram = React.createClass({
 				<g className='bars'>
 					{this.state.bars.map(this.makeBar)}
 				</g>
+				<Axis {...this.props} data = {this.state.bars} />
 			</g>
 		);
 	}
@@ -98,7 +99,10 @@ var Axis = React.createClass({
 									.scale(this.yScale)
 									.orient('left')
 									.tickFormat(function (d) {
-										// Why tickFormat()(d) ?
+										// NB: prepend a dollar sign to the scale’s default tick formatter.
+										// ? : How does 'this.yScale.tickFormat()(d)' work?
+// console.log('this.yScale.tickFormat():');
+// console.log(this.yScale.tickFormat());
 										return ('$' + this.yScale.tickFormat()(d));
 									}.bind(this));
 	  this.update_d3(this.props);
@@ -106,11 +110,43 @@ var Axis = React.createClass({
 	componentWillReceiveProps: function (nextProps) {
 	  this.update_d3(nextProps);
 	},
-	udpate_d3: function (props) {
-
+	update_d3: function (props) {
+		this.yScale
+			.domain([0,
+							d3.max(props.data.map(
+								function (d) { return (d.x + d.dx); })
+							)])
+			.range([0,
+							(props.height - props.topMargin - props.bottomMargin)
+						]);
+		this.axis
+			.ticks(props.data.length)
+			// ? : How does this whole tickValues thing work? Can't we use the default tick values?
+			.tickValues(props.data
+										.map(function (d){
+// console.log('tickValues d.x :');
+// console.log(d.x);
+											return d.x;
+										})
+										.concat(props.data[props.data.length - 1].x + props.data[props.data.length - 1].dx)
+									);
 	},
+	// - - - - - - - - - - - - - - -
+	// Dirty trick
+	componentDidUpdate: function (prevProps, prevState) {
+		this.renderAxis();
+	},
+	componentDidMount: function () {
+		this.renderAxis();
+	},
+	renderAxis: function () {
+		var node = this.getDOMNode();
+		d3.select(node).call(this.axis);
+	},
+	// - - - - - - - - - - - - - - -
 	render: function () {
 		var translate = 'translate(' + (this.props.axisMargin - 3) + ', 0)';
+		// ? : can't we just call the axis-generating code in the return statement here?
 		return (
 			<g className = 'axis' transform = {translate}>
 			</g>
