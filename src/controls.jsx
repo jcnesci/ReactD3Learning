@@ -28,6 +28,8 @@ var ControlRow = React.createClass({
 											function(value, key) {
 												return newState && key == picked;
 											});
+		// If newState is false, we want to reset.
+		this.props.updateDataFilter(picked, !newState);
 		// setState updates ControlRow and triggers a re-render of all the buttons.
 		this.setState({toggleValues: toggleValues});
 	},
@@ -62,6 +64,12 @@ var ControlRow = React.createClass({
 var Toggle = React.createClass({
 	getInitialState: function() {
     return {value: false};
+	},
+	handleClick: function() {
+		var newState = !this.state.value;
+		// Update the button's visual state now (just so it updates faster) even though we'll be updating it in ControlRow's render with onClick below.
+		this.setState({value: newState});
+		this.props.onClick(this.props.name, newState);
 	},
 	componentWillReceiveProps: function(nextProps) {
 		// When Toggle gets re-rendered in ControlRow, setState and re-render Toggle.
