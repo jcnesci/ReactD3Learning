@@ -41471,7 +41471,6 @@ var React = require("./../bower_components/react/react.js"),
 
 var Controls = React.createClass({displayName: "Controls",
 	render: function() {
-// console.log(this.props.data)
 		var getYears = function(data) {
 			return _.keys(_.groupBy(data,
 															function (d) {
@@ -41491,14 +41490,17 @@ var Controls = React.createClass({displayName: "Controls",
 
 var ControlRow = React.createClass({displayName: "ControlRow",
 	makePick: function(picked, newState) {
+		// Goes through the toggleValues dictionary and sets them to false if they aren’t the one the user clicked on.
 		var toggleValues = this.state.toggleValues;
 		toggleValues = _.mapValues(toggleValues,
 											function(value, key) {
 												return newState && key == picked;
 											});
+		// setState updates ControlRow and triggers a re-render of all the buttons.
 		this.setState({toggleValues: toggleValues});
 	},
 	getInitialState: function() {
+    // Initially create the toggleValues dictionary with everything set to false.
     var toggles = this.props.getToggleNames(this.props.data),
     		toggleValues = _.zipObject(toggles,
     																toggles.map(function() { return false; }));
@@ -41530,10 +41532,12 @@ var Toggle = React.createClass({displayName: "Toggle",
     return {value: false};
 	},
 	componentWillReceiveProps: function(nextProps) {
+		// When Toggle gets re-rendered in ControlRow, setState and re-render Toggle.
 		this.setState({value: nextProps.value});
 	},
 	render: function() {
 		var className = 'btn btn-default';
+		// If this.state.value is true, the button is highlighted.
 		if (this.state.value) {
 			className += ' btn-primary';
 		}
