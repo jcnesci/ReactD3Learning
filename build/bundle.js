@@ -41699,9 +41699,5 @@ React.render(
 	React.createElement(H1BGraph, {url: "data/h1bs.csv"}),
 	document.querySelectorAll('.h1bgraph')[0]
 );
-React.render(
-	React.createElement(H1BGraph, {url: "data/h1bs.csv"}),
-	document.querySelectorAll('.h2bgraph')[0]
-);
 
 },{"./../bower_components/d3/d3.js":1,"./../bower_components/lodash/lodash.js":2,"./../bower_components/react/react.js":3,"./drawers.jsx":4}]},{},[5]);
