@@ -1,7 +1,8 @@
 var	React = require('react'),
 		_ = require('lodash'),
 		d3 = require('d3'),
-		drawers = require('./drawers.jsx');
+		drawers = require('./drawers.jsx'),
+		Controls = require('./controls.jsx');
 
 var H1BGraph = React.createClass({
 	componentWillMount: function () {
@@ -11,7 +12,7 @@ var H1BGraph = React.createClass({
     return {rawData: []};
 	},
 	loadRawData: function () {
-		var dateFormat = d3.time.format('%m%d%Y');
+		var dateFormat = d3.time.format('%m/%d/%Y');
 		d3.csv(this.props.url)
 			.row(function (d) {
 				if (!d['base salary']) {
@@ -55,12 +56,15 @@ var H1BGraph = React.createClass({
 			fullWidth = 700;
 
 		return (
-			<div className = 'row'>
-				<div className = 'col-md-12'>
-					<svg width = {fullWidth} height = {params.height}>
-						<drawers.Histogram {...params} data = {this.state.rawData} />
-					</svg>
+			<div>
+				<div className = 'row'>
+					<div className = 'col-md-12'>
+						<svg width = {fullWidth} height = {params.height}>
+							<drawers.Histogram {...params} data = {this.state.rawData} />
+						</svg>
+					</div>
 				</div>
+				<Controls data = {this.state.rawData} updateDataFilter = {this.updateDataFilter} />
 			</div>
 		);
 	}

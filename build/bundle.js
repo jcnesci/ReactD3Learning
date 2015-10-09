@@ -41467,6 +41467,88 @@ module.exports = warning;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],4:[function(require,module,exports){
 var React = require("./../bower_components/react/react.js"),
+		_ = require("./../bower_components/lodash/lodash.js");
+
+var Controls = React.createClass({displayName: "Controls",
+	render: function() {
+// console.log(this.props.data)
+		var getYears = function(data) {
+			return _.keys(_.groupBy(data,
+															function (d) {
+																return d.submit_date.getFullYear()
+															}))
+							.map(Number);
+		};
+		return (
+			React.createElement("div", null, 
+				React.createElement(ControlRow, {data: this.props.data, 
+										getToggleNames: getYears, 
+										updateDataFilter: this.updateYearFilter})
+			)
+		);
+	}
+});
+
+var ControlRow = React.createClass({displayName: "ControlRow",
+	makePick: function(picked, newState) {
+		var toggleValues = this.state.toggleValues;
+		toggleValues = _.mapValues(toggleValues,
+											function(value, key) {
+												return newState && key == picked;
+											});
+		this.setState({toggleValues: toggleValues});
+	},
+	getInitialState: function() {
+    var toggles = this.props.getToggleNames(this.props.data),
+    		toggleValues = _.zipObject(toggles,
+    																toggles.map(function() { return false; }));
+    return {toggleValues: toggleValues};
+	},
+	render: function() {
+		return (
+			React.createElement("div", {className: "row"}, 
+				React.createElement("div", {className: "col-md-12"}, 
+					this.props.getToggleNames(this.props.data).map(function (name) {
+						var key = 'toggle-' + name,
+								label = name;
+						return (
+							React.createElement(Toggle, {label: label, 
+											name: name, 
+											key: key, 
+											value: this.state.toggleValues[name], 
+											onClick: this.makePick})
+						);
+					}.bind(this))
+				)
+			)
+		);
+	}
+});
+
+var Toggle = React.createClass({displayName: "Toggle",
+	getInitialState: function() {
+    return {value: false};
+	},
+	componentWillReceiveProps: function(nextProps) {
+		this.setState({value: nextProps.value});
+	},
+	render: function() {
+		var className = 'btn btn-default';
+		if (this.state.value) {
+			className += ' btn-primary';
+		}
+		return (
+			React.createElement("button", {className: className, onClick: this.handleClick}, 
+				this.props.label
+			)
+		);
+	}
+});
+
+module.exports = Controls;
+
+},{"./../bower_components/lodash/lodash.js":2,"./../bower_components/react/react.js":3}],5:[function(require,module,exports){
+var React = require("./../bower_components/react/react.js"),
 		d3 = require("./../bower_components/d3/d3.js");
 
 var Histogram = React.createClass({displayName: "Histogram",
@@ -41626,11 +41708,12 @@ module.exports = {
 	Histogram: Histogram
 };
 
-},{"./../bower_components/d3/d3.js":1,"./../bower_components/react/react.js":3}],5:[function(require,module,exports){
+},{"./../bower_components/d3/d3.js":1,"./../bower_components/react/react.js":3}],6:[function(require,module,exports){
 var	React = require("./../bower_components/react/react.js"),
 		_ = require("./../bower_components/lodash/lodash.js"),
 		d3 = require("./../bower_components/d3/d3.js"),
-		drawers = require('./drawers.jsx');
+		drawers = require('./drawers.jsx'),
+		Controls = require('./controls.jsx');
 
 var H1BGraph = React.createClass({displayName: "H1BGraph",
 	componentWillMount: function () {
@@ -41640,7 +41723,7 @@ var H1BGraph = React.createClass({displayName: "H1BGraph",
     return {rawData: []};
 	},
 	loadRawData: function () {
-		var dateFormat = d3.time.format('%m%d%Y');
+		var dateFormat = d3.time.format('%m/%d/%Y');
 		d3.csv(this.props.url)
 			.row(function (d) {
 				if (!d['base salary']) {
@@ -41684,12 +41767,15 @@ var H1BGraph = React.createClass({displayName: "H1BGraph",
 			fullWidth = 700;
 
 		return (
-			React.createElement("div", {className: "row"}, 
-				React.createElement("div", {className: "col-md-12"}, 
-					React.createElement("svg", {width: fullWidth, height: params.height}, 
-						React.createElement(drawers.Histogram, React.__spread({},  params, {data: this.state.rawData}))
+			React.createElement("div", null, 
+				React.createElement("div", {className: "row"}, 
+					React.createElement("div", {className: "col-md-12"}, 
+						React.createElement("svg", {width: fullWidth, height: params.height}, 
+							React.createElement(drawers.Histogram, React.__spread({},  params, {data: this.state.rawData}))
+						)
 					)
-				)
+				), 
+				React.createElement(Controls, {data: this.state.rawData, updateDataFilter: this.updateDataFilter})
 			)
 		);
 	}
@@ -41700,4 +41786,4 @@ React.render(
 	document.querySelectorAll('.h1bgraph')[0]
 );
 
-},{"./../bower_components/d3/d3.js":1,"./../bower_components/lodash/lodash.js":2,"./../bower_components/react/react.js":3,"./drawers.jsx":4}]},{},[5]);
+},{"./../bower_components/d3/d3.js":1,"./../bower_components/lodash/lodash.js":2,"./../bower_components/react/react.js":3,"./controls.jsx":4,"./drawers.jsx":5}]},{},[6]);
