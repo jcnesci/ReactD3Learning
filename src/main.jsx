@@ -9,7 +9,11 @@ var H1BGraph = React.createClass({
     this.loadRawData();
 	},
 	getInitialState: function () {
-    return {rawData: []};
+    return {rawData: [],
+    				dataFilter: function () { return true; }};
+	},
+	updateDataFilter: function (filter) {
+		this.setState({dataFilter: filter});
 	},
 	loadRawData: function () {
 		var dateFormat = d3.time.format('%m/%d/%Y');
@@ -53,14 +57,16 @@ var H1BGraph = React.createClass({
 			bottomMargin: 5,
 			value: function (d) { return d.base_salary; }
 		},
-			fullWidth = 700;
+		fullWidth = 700;
+
+		var filteredData = this.state.rawData.filter(this.state.dataFilter);
 
 		return (
 			<div>
 				<div className = 'row'>
 					<div className = 'col-md-12'>
 						<svg width = {fullWidth} height = {params.height}>
-							<drawers.Histogram {...params} data = {this.state.rawData} />
+							<drawers.Histogram {...params} data = {filteredData} />
 						</svg>
 					</div>
 				</div>
