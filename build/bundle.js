@@ -41470,6 +41470,20 @@ var React = require("./../bower_components/react/react.js"),
 		_ = require("./../bower_components/lodash/lodash.js");
 
 var Controls = React.createClass({displayName: "Controls",
+	updateYearFilter: function (year, reset) {
+		var filter = function(d) {
+			return d.submit_date.getFullYear() == year;
+		};
+
+		if (reset || !year) {
+			filter = function () { return true; };
+		}
+
+		this.setState({yearFilter: filter});
+	},
+	getInitialState: function () {
+    return {yearFilter: function () { return true; }};
+	},
 	render: function() {
 		var getYears = function(data) {
 			return _.keys(_.groupBy(data,
