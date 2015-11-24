@@ -54,7 +54,11 @@ var ControlRow = React.createClass({
 											value = {this.state.toggleValues[name]}
 											onClick = {this.makePick} />
 						);
-					}.bind(this))}
+					}
+					// TIP: bad way to bind data to the current React element (uses old bind method):
+					// .bind(this))}
+					// TIP: good way to bind data to the current React element (uses ES5 second argument):
+					, this)}
 				</div>
 			</div>
 		);
