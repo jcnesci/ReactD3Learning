@@ -41484,6 +41484,18 @@ var Controls = React.createClass({displayName: "Controls",
 	getInitialState: function () {
     return {yearFilter: function () { return true; }};
 	},
+	componentDidUpdate: function () {
+		this.props.updateDataFilter(
+			(function (filters) {
+				return function (d) {
+					return filters.yearFilter(d)
+				};
+			})(this.state)
+		);
+	},
+	shouldComponentUpdate: function (nextProps, nextState) {
+		return !_.isEqual(this.state, nextState);
+	},
 	render: function() {
 		var getYears = function(data) {
 			return _.keys(_.groupBy(data,
