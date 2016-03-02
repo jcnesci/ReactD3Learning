@@ -1,7 +1,13 @@
+How to use
+==============
+
+1. Launch site, in Terminal in main directory type: `live-server`
+2. Run grunt to auto-update site as you work: `grunt`
+
 Learning Notes
 ==============
 
-What kind of development server does this project use to server HTML pages?
+What kind of development server does this project use to serve HTML pages?
 
 > live-server, because it refreshes the page mautomatically when the code changes.
 
